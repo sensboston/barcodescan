@@ -90,20 +90,18 @@ namespace BarcodeScanner
         {
             Dispatcher.BeginInvoke(() =>
             {
-                WriteableBitmap wb = new WriteableBitmap(640, 480);
+                if (_camera != null && cameraVisualizer.Visibility == Visibility.Visible)
+                {
+                    txtStatus.Text = "Scanning...";
+                    WriteableBitmap wb = new WriteableBitmap(640, 480);
 
-                if (_camera != null)
-                    try
-                    {
-                        _camera.GetCurrentFrame(wb);
-                        wb.Invalidate();
+                    _camera.GetCurrentFrame(wb);
+                    wb.Invalidate();
 
-                        ScanBarcode(wb);
-                    }
-                    finally
-                    {
-                        GrabFrame();
-                    }
+                    ScanBarcode(wb);
+
+                    GrabFrame();
+                }
             });
         }
 
@@ -161,6 +159,22 @@ namespace BarcodeScanner
             }
         }
 
+        private void PhoneApplicationPage_OrientationChanged(object sender, OrientationChangedEventArgs e)
+        {
+            CompositeTransform cameraTrans = cameraVisualizer.RenderTransform as CompositeTransform;
+            CompositeTransform canvasTrans = imageCanvas.RenderTransform as CompositeTransform;
+
+            if (e.Orientation == PageOrientation.LandscapeRight)
+            {
+                cameraTrans.Rotation = canvasTrans.Rotation = 180;
+            }
+            else
+            {
+                cameraTrans.Rotation = canvasTrans.Rotation = 0;
+            }
+        }
+
+        #region Services
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
             if (_imageName != "")
@@ -200,20 +214,6 @@ namespace BarcodeScanner
             SmsComposeTask sms = new SmsComposeTask() { Body = s };
             sms.Show();
         }
-
-        private void PhoneApplicationPage_OrientationChanged(object sender, OrientationChangedEventArgs e)
-        {
-            CompositeTransform cameraTrans = cameraVisualizer.RenderTransform as CompositeTransform;
-            CompositeTransform canvasTrans = imageCanvas.RenderTransform as CompositeTransform;
-
-            if (e.Orientation == PageOrientation.LandscapeRight)
-            {
-                cameraTrans.Rotation = canvasTrans.Rotation = 180;
-            }
-            else
-            {
-                cameraTrans.Rotation = canvasTrans.Rotation = 0;
-            }
-        }
+        #endregion
     }
 }
