@@ -1,0 +1,41 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="BarcodeScanner.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="clr-namespace:Microsoft.Phone;assembly=Microsoft.Phone.Media.Extended"    
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="480"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Landscape" Orientation="Landscape"
+    shell:SystemTray.IsVisible="False" IsEnabled="True" OrientationChanged="PhoneApplicationPage_OrientationChanged">
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent" MouseLeftButtonDown="LayoutRoot_MouseLeftButtonDown">
+        <Canvas x:Name="imageCanvas" Height="480" Width="640" Visibility="Collapsed" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5"> 
+            <Image x:Name="snapshotImage" Height="480" Width="640" Visibility="Visible" HorizontalAlignment="Stretch"/>
+            <Polyline x:Name="barcodeBounds" Stroke="Red" StrokeThickness="5" />
+            <Canvas.RenderTransform>
+                <CompositeTransform Rotation="0"/>
+            </Canvas.RenderTransform>
+        </Canvas>
+        <media:CameraVisualizer x:Name="cameraVisualizer" Height="480" Width="640" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5">
+            <media:CameraVisualizer.RenderTransform>
+                <CompositeTransform Rotation="0"/>
+            </media:CameraVisualizer.RenderTransform>
+        </media:CameraVisualizer>
+        <TextBlock VerticalAlignment="Bottom" x:Name="txtStatus" Text="Scanning..." Margin="160,0,0,3" TextAlignment="Center" FontSize="28" Height="48" />
+        <TextBlock HorizontalAlignment="Stretch" Name="infoText" Text="Touch screen to continue scanning..." VerticalAlignment="Stretch" FontSize="32" TextAlignment="Center" Foreground="Red" FontWeight="Normal" Canvas.Top="252" Margin="160,0,0,434" Visibility="Collapsed" />
+        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Name="buttonsPanel" Visibility="Collapsed" Background="#7DA9A9A9" HorizontalAlignment="Left" Height="480">
+            <Button Content="Save" Height="95" HorizontalAlignment="Left" Name="saveButton" VerticalAlignment="Stretch" Width="160" IsEnabled="True" Click="saveButton_Click" />
+            <Button Content="Bing" Height="95" Name="bingButton" Width="160" IsEnabled="True" Click="bingButton_Click" VerticalAlignment="Stretch" />
+            <Button Content="Google" Height="95" IsEnabled="True" Name="googleButton" Width="160" Click="googleButton_Click" VerticalAlignment="Stretch" />
+            <Button Content="Mail" Height="95" HorizontalAlignment="Left" IsEnabled="True" Name="mailButton" VerticalAlignment="Stretch" Width="160" Click="mailButton_Click" />
+            <Button Content="SMS" Height="95" HorizontalAlignment="Left" IsEnabled="True" Name="smsButton" VerticalAlignment="Stretch" Width="160" Click="smsButton_Click" />
+        </StackPanel>
+    </Grid>
+</phone:PhoneApplicationPage>
