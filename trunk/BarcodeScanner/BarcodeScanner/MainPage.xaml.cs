@@ -93,8 +93,9 @@ namespace BarcodeScanner
                 if (_camera != null && cameraVisualizer.Visibility == Visibility.Visible)
                 {
                     txtStatus.Text = "Scanning...";
-                    WriteableBitmap wb = new WriteableBitmap(640, 480);
 
+                    WriteableBitmap wb = new WriteableBitmap(640, 480);
+                    
                     _camera.GetCurrentFrame(wb);
                     wb.Invalidate();
 
@@ -125,7 +126,7 @@ namespace BarcodeScanner
                     txtStatus.Foreground = new SolidColorBrush(Colors.Yellow);
                     _imageName = "barcode_" + result.BarcodeFormat.Name + "_" + result.Text;
                     
-                    snapshotImage.Source = wb;
+                    snapshotImage.Source = new WriteableBitmap(wb);
 
                     // Hide camera visualizer, show controls
                     cameraVisualizer.Visibility = Visibility.Collapsed;
@@ -133,11 +134,21 @@ namespace BarcodeScanner
                     imageCanvas.Visibility = Visibility.Visible;
                     buttonsPanel.Visibility = Visibility.Visible;
                 }
-                else _camera.Focus();
+                else AutoFocus();
             }
             catch 
-            { 
-                _camera.Focus(); 
+            {
+                AutoFocus();
+            }
+        }
+
+        private int _skipFrames = 0;
+        private void AutoFocus()
+        {
+            if (_skipFrames++ > 3)
+            {
+                _camera.Focus();
+                _skipFrames = 0;
             }
         }
 
