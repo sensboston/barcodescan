@@ -30,6 +30,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
 using com.google.zxing;
 using com.google.zxing.common;
 using com.google.zxing.qrcode;
@@ -145,7 +146,7 @@ namespace BarcodeScanner
         private int _skipFrames = 0;
         private void AutoFocus()
         {
-            if (_skipFrames++ > 3)
+            if (_skipFrames++ > 4)
             {
                 _camera.Focus();
                 _skipFrames = 0;
@@ -200,16 +201,25 @@ namespace BarcodeScanner
 
         private void bingButton_Click(object sender, RoutedEventArgs e)
         {
-            string s = _imageName.Replace("_", " ").Replace("barcode", "");
+            string s = _imageName.Replace("_", " ").Replace("barcode", "").Trim();
+            if (s.Contains("UPC") || s.Contains("EAN") || s.Contains("CODE"))
+            {
+                int pos = s.IndexOf(" ")+1;
+                s = s.Remove(pos, s.IndexOf(" ", pos) - pos + 1);
+            }
             SearchTask search = new SearchTask() { SearchQuery = s };
             search.Show();
         }
 
         private void googleButton_Click(object sender, RoutedEventArgs e)
         {
-            string s = _imageName.Replace("_", "+").Replace("barcode", "");
-            WebBrowserTask google = new WebBrowserTask() { URL = "http://www.google.com/search?q=" + s };
-            google.Show();
+            string s = _imageName.Replace("_", "+").Replace("barcode", "").Trim().Remove(0, 1);
+            if (s.Contains("UPC") || s.Contains("EAN") || s.Contains("CODE"))
+            {
+                int pos = s.IndexOf("+") + 1;
+                s = s.Remove(pos, s.IndexOf("+", pos) - pos + 1);
+            }
+            NavigationService.Navigate(new Uri("/Browser.xaml?url=" + Uri.EscapeUriString("http://www.google.com/m/search?q="+s), UriKind.Relative));
         }
 
         private void mailButton_Click(object sender, RoutedEventArgs e)
