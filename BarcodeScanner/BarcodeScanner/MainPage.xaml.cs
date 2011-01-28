@@ -31,12 +31,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
+
 using com.google.zxing;
 using com.google.zxing.common;
 using com.google.zxing.qrcode;
+
 using Microsoft.Phone;
 using Microsoft.Phone.Tasks;
 using Microsoft.Phone.Controls;
+using Microsoft.Phone.Info;
 using Microsoft.Xna.Framework.Media;
 
 namespace BarcodeScanner
@@ -47,16 +50,40 @@ namespace BarcodeScanner
         private MultiFormatReader _mfr;
         private string _imageName = "";
 
+        private int _skipFrames = 0;
+        private bool _IsHTC = false;
+        private int SkipedFramesMax { get { return _IsHTC ? 5 : 2;  } }
+
         // Constructor
         public MainPage()
         {
             InitializeComponent();
+
+            // Detect HTC handsets: they have better built-in autofocus
+            string result = string.Empty;
+            object manufacturer;
+            if (DeviceExtendedProperties.TryGetValue("DeviceManufacturer", out manufacturer))
+            {
+                result = manufacturer.ToString();
+                if (result.Contains("HTC")) _IsHTC = true;
+            }
         }
 
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
+            // Hide controls, show camera visualizer
+            buttonsPanel.Visibility = Visibility.Collapsed;
+            infoText.Visibility = Visibility.Collapsed;
+            imageCanvas.Visibility = Visibility.Collapsed;
+
+            txtStatus.Foreground = new SolidColorBrush(Colors.White);
+            txtStatus.Text = "Scanning...";
+
+            cameraVisualizer.Visibility = Visibility.Visible;
+
 
             InitializeCamera();
         }
@@ -143,10 +170,9 @@ namespace BarcodeScanner
             }
         }
 
-        private int _skipFrames = 0;
         private void AutoFocus()
         {
-            if (_skipFrames++ > 4)
+            if (_skipFrames++ > SkipedFramesMax)
             {
                 _camera.Focus();
                 _skipFrames = 0;
@@ -160,7 +186,7 @@ namespace BarcodeScanner
                 // Hide controls, show camera visualizer
                 buttonsPanel.Visibility = Visibility.Collapsed;
                 infoText.Visibility = Visibility.Collapsed;
-                imageCanvas.Visibility = Visibility.Visible;
+                imageCanvas.Visibility = Visibility.Collapsed;
 
                 txtStatus.Foreground = new SolidColorBrush(Colors.White);
                 txtStatus.Text = "Scanning...";
